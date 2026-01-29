@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal Destiny - Hero Registry</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .wallet-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .connect-btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .connect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .wallet-address {
+            display: inline-block;
+            padding: 12px 24px;
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+            border-radius: 10px;
+            color: #86efac;
+            font-family: monospace;
+        }
+
+        .loading-message {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: center;
+            color: #93c5fd;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .hero-card-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+            border: 2px solid rgba(139, 92, 246, 0.5);
+            border-radius: 16px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card::before {
+            content: '⚔️';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 120px;
+            opacity: 0.1;
+        }
+
+        .hero-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 20px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-name {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .hero-rank {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #a78bfa;
+            margin-bottom: 25px;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .badges-section {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .badges-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #cbd5e1;
+        }
+
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .badge:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .badge.locked {
+            opacity: 0.3;
+        }
+
+        .badge.earned {
+            border-color: rgba(34, 197, 94, 0.5);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .badge-icon {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .badge-name {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .share-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .leaderboard-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .leaderboard-row {
+            display: grid;
+            grid-template-columns: 60px 1fr 150px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .leaderboard-row:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateX(5px);
+        }
+
+        .leaderboard-row.top3 {
+            background: linear-gradient(90deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.1));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .rank-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #8b5cf6;
+        }
+
+        .rank-number.gold { color: #fbbf24; }
+        .rank-number.silver { color: #d1d5db; }
+        .rank-number.bronze { color: #f97316; }
+
+        .holder-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .holder-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .holder-name {
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .holder-title {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .stat-column {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        @media (max-width: 968px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚔️ Terminal Destiny Hero Registry</h1>
+            <p>Claim Your Hero Card • Climb The Ranks • Earn Badges</p>
+        </div>
+
+        <div class="wallet-section">
+            <div id="walletConnect">
+                <button class="connect-btn" onclick="connectWallet()">
+                    🔗 Connect Wallet (Phantom)
+                </button>
+                <p style="margin-top: 15px; color: #94a3b8;">Connect your Solana wallet to see your $DESTINY hero card</p>
+            </div>
+            <div id="walletConnected" style="display: none;">
+                <p style="margin-bottom: 10px; color: #94a3b8;">Connected:</p>
+                <div class="wallet-address" id="walletAddress"></div>
+                <div class="loading-message" id="loadingMessage">
+                    🔄 Loading your hero data from blockchain...
+                </div>
+            </div>
+        </div>
+
+        <div class="main-grid" id="mainContent" style="display: none;">
+            <div class="hero-card-section">
+                <h2 class="section-title">Your Hero Card</h2>
+                <div class="hero-card">
+                    <div class="hero-avatar" id="heroAvatar">🛡️</div>
+                    <div class="hero-name" id="heroName">Hero</div>
+                    <div class="hero-rank" id="heroRank">⚔️ Loading...</div>
+                    
+                    <div class="hero-stats">
+                        <div class="stat-box">
+                            <div class="stat-value" id="daysHolding">-</div>
+                            <div class="stat-label">Days Holding</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="globalRank">#-</div>
+                            <div class="stat-label">Global Rank</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="destinyAmount">-</div>
+                            <div class="stat-label">$DESTINY</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="transactions">-</div>
+                            <div class="stat-label">Transactions</div>
+                        </div>
+                    </div>
+
+                    <div class="badges-section">
+                        <div class="badges-title">🏆 Badges (<span id="badgeCount">0</span>/12)</div>
+                        <div class="badges-grid" id="badgesGrid"></div>
+                    </div>
+
+                    <button class="share-btn" onclick="shareCard()">
+                        📤 Share Your Hero Card on X
+                    </button>
+                </div>
+            </div>
+
+            <div class="leaderboard-section">
+                <h2 class="section-title">🏆 Hero Leaderboard</h2>
+                <div class="leaderboard-table" id="leaderboardTable">
+                    <div class="loading-message">Loading leaderboard...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CONFIG = {
+            CONTRACT_ADDRESS: '3AwkJnZL7xrf8ffUwEsSkKndQkPSj2vfR3CqvyFpk8UP',
+            RPC_ENDPOINT: 'https://api.mainnet-beta.solana.com',
+            TOKEN_PROGRAM: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
+        };
+
+        const BADGES = [
+            { id: 'early', icon: '🔥', name: 'Early Hero', check: (data) => data.daysHolding >= 30 },
+            { id: 'diamond', icon: '💎', name: 'Diamond Hands', check: (data) => data.daysHolding >= 60 },
+            { id: 'whale', icon: '🌟', name: 'Whale', check: (data) => data.rank <= 100 },
+            { id: 'champion', icon: '🛡️', name: 'Champion', check: (data) => data.rank <= 50 },
+            { id: 'legend', icon: '👑', name: 'Legend', check: (data) => data.rank <= 10 },
+            { id: 'warrior', icon: '🗡️', name: 'Warrior', check: (data) => data.daysHolding >= 90 },
+            { id: 'holder', icon: '🎯', name: 'True Holder', check: (data) => data.balance > 1000000 },
+            { id: 'og', icon: '⭐', name: 'OG', check: (data) => data.txCount >= 5 },
+            { id: 'ambassador', icon: '📣', name: 'Ambassador', check: (data) => data.balance > 500000 },
+            { id: 'fud_slayer', icon: '⚔️', name: 'FUD Slayer', check: (data) => data.daysHolding >= 45 },
+            { id: 'elite', icon: '🏆', name: 'Elite', check: (data) => data.rank <= 25 },
+            { id: 'founder', icon: '✨', name: 'Founder', check: (data) => data.rank <= 5 }
+        ];
+
+        const RANKS = [
+            { min: 10000000, name: 'Legendary Hero', icon: '👑' },
+            { min: 5000000, name: 'Epic Hero', icon: '⚔️' },
+            { min: 2000000, name: 'Diamond Hero', icon: '💎' },
+            { min: 1000000, name: 'Rare Hero', icon: '🛡️' },
+            { min: 500000, name: 'Elite Hero', icon: '🗡️' },
+            { min: 100000, name: 'Brave Hero', icon: '🏹' },
+            { min: 0, name: 'Rookie Hero', icon: '🎯' }
+        ];
+
+        let connectedWallet = null;
+        let userData = null;
+        let allHolders = [];
+
+        async function connectWallet() {
+            try {
+                if (typeof window.solana === 'undefined') {
+                    alert('Please install Phantom wallet: https://phantom.app');
+                    return;
+                }
+
+                const resp = await window.solana.connect();
+                connectedWallet = resp.publicKey.toString();
+
+                document.getElementById('walletConnect').style.display = 'none';
+                document.getElementById('walletConnected').style.display = 'block';
+                document.getElementById('walletAddress').textContent = 
+                    connectedWallet.slice(0, 6) + '...' + connectedWallet.slice(-4);
+                document.getElementById('mainContent').style.display = 'grid';
+
+                await loadUserData();
+                
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                alert('Failed to connect wallet. Please try again.');
+            }
+        }
+
+        async function loadUserData() {
+            try {
+                const balance = await getTokenBalance(connectedWallet);
+                const transactions = await getTransactionCount(connectedWallet);
+                
+                // Load all holders for ranking
+                allHolders = await getAllHolders();
+                const rank = allHolders.findIndex(h => h.address === connectedWallet) + 1 || 999;
+                
+                // Estimate days holding (simplified - based on transaction history)
+                const daysHolding = transactions > 0 ? Math.min(Math.floor(transactions * 5), 120) : 0;
+                
+                userData = {
+                    address: connectedWallet,
+                    balance: balance,
+                    daysHolding: daysHolding,
+                    rank: rank,
+                    txCount: transactions,
+                    earnedBadges: []
+                };
+
+                calculateBadges();
+                updateHeroCard();
+                renderLeaderboard();
+                
+                document.getElementById('loadingMessage').style.display = 'none';
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('loadingMessage').innerHTML = 
+                    '⚠️ Error loading blockchain data. Please refresh and try again.';
+            }
+        }
+
+        async function getTokenBalance(walletAddress) {
+            const response = await fetch(CONFIG.RPC_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    id: 1,
+                    method: 'getTokenAccountsByOwner',
+                    params: [
+                        walletAddress,
+                        { mint: CONFIG.CONTRACT_ADDRESS },
+                        { encoding: 'jsonParsed' }
+                    ]
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.result && data.result.value.length > 0) {
+                return data.result.value[0].account.data.parsed.info.tokenAmount.uiAmount;
+            }
+            
+            return 0;
+        }
+
+        async function getTransactionCount(walletAddress) {
+            const response = await fetch(CONFIG.RPC_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    id: 1,
+                    method: 'getSignaturesForAddress',
+                    params: [walletAddress, { limit: 100 }]
+                })
+            });
+            
+            const data = await response.json();
+            return data.result ? data.result.length : 0;
+        }
+
+        async function getAllHolders() {
+            try {
+                // Note: This is a heavy call and may timeout on free RPC endpoints
+                // Consider using a paid RPC or caching this data
+                const response = await fetch(CONFIG.RPC_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        jsonrpc: '2.0',
+                        id: 1,
+                        method: 'getProgramAccounts',
+                        params: [
+                            CONFIG.TOKEN_PROGRAM,
+                            {
+                                encoding: 'jsonParsed',
+                                filters: [
+                                    { dataSize: 165 },
+                                    { memcmp: { offset: 0, bytes: CONFIG.CONTRACT_ADDRESS }}
+                                ]
+                            }
+                        ]
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.result) {
+                    return data.result
+                        .map(account => ({
+                            address: account.account.data.parsed.info.owner,
+                            balance: account.account.data.parsed.info.tokenAmount.uiAmount
+                        }))
+                        .filter(h => h.balance > 0)
+                        .sort((a, b) => b.balance - a.balance);
+                }
+                
+                return [];
+            } catch (error) {
+                console.error('Error fetching holders:', error);
+                // Return mock data if blockchain call fails
+                return generateMockHolders();
+            }
+        }
+
+        function generateMockHolders() {
+            const holders = [];
+            for (let i = 0; i < 50; i++) {
+                holders.push({
+                    address: '0x' + Math.random().toString(36).substring(2, 15),
+                    balance: Math.floor(Math.random() * 10000000) + 100000
+                });
+            }
+            return holders.sort((a, b) => b.balance - a.balance);
+        }
+
+        function calculateBadges() {
+            userData.earnedBadges = BADGES
+                .filter(badge => badge.check(userData))
+                .map(badge => badge.id);
+        }
+
+        function updateHeroCard() {
+            const heroName = 'Hero' + connectedWallet.slice(2, 6).toUpperCase();
+            document.getElementById('heroName').textContent = heroName;
+            
+            const rank = RANKS.find(r => userData.balance >= r.min);
+            document.getElementById('heroRank').textContent = rank.icon + ' ' + rank.name;
+            document.getElementById('heroAvatar').textContent = rank.icon;
+            
+            document.getElementById('daysHolding').textContent = userData.daysHolding;
+            document.getElementById('globalRank').textContent = '#' + userData.rank;
+            document.getElementById('destinyAmount').textContent = formatNumber(userData.balance);
+            document.getElementById('transactions').textContent = userData.txCount;
+            
+            renderBadges();
+        }
+
+        function renderBadges() {
+            const badgesGrid = document.getElementById('badgesGrid');
+            badgesGrid.innerHTML = '';
+            
+            BADGES.forEach(badge => {
+                const isEarned = userData.earnedBadges.includes(badge.id);
+                const badgeEl = document.createElement('div');
+                badgeEl.className = 'badge' + (isEarned ? ' earned' : ' locked');
+                badgeEl.innerHTML = `
+                    <div class="badge-icon">${isEarned ? badge.icon : '🔒'}</div>
+                    <div class="badge-name">${badge.name}</div>
+                `;
+                badgesGrid.appendChild(badgeEl);
+            });
+            
+            document.getElementById('badgeCount').textContent = userData.earnedBadges.length;
+        }
+
+        function renderLeaderboard() {
+            const table = document.getElementById('leaderboardTable');
+            table.innerHTML = '';
+            
+            const topHolders = allHolders.slice(0, 20);
+            
+            topHolders.forEach((holder, index) => {
+                const rank = index + 1;
+                const isUser = holder.address === connectedWallet;
+                const isTop3 = rank <= 3;
+                
+                const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+                const rankIcon = RANKS.find(r => holder.balance >= r.min).icon;
+                const rankTitle = RANKS.find(r => holder.balance >= r.min).name;
+                
+                const row = document.createElement('div');
+                row.className = 'leaderboard-row' + (isTop3 ? ' top3' : '');
+                if (isUser) {
+                    row.style.background = 'rgba(59, 130, 246, 0.2)';
+                    row.style.border = '1px solid rgba(59, 130, 246, 0.5)';
+                }
+                
+                row.innerHTML = `
+                    <div class="rank-number ${rankClass}">${rank}</div>
+                    <div class="holder-info">
+                        <div class="holder-avatar">${rankIcon}</div>
+                        <div>
+                            <div class="holder-name">${isUser ? 'YOU' : 'Hero' + holder.address.slice(0, 6)}</div>
+                            <div class="holder-title">${rankTitle}</div>
+                        </div>
+                    </div>
+                    <div class="stat-column" style="color: #fbbf24;">${formatNumber(holder.balance)}</div>
+                `;
+                
+                table.appendChild(row);
+            });
+        }
+
+        function shareCard() {
+            const rankName = RANKS.find(r => userData.balance >= r.min).name;
+            const text = `I'm a ${rankName} in Terminal Destiny! ⚔️
+
+🏆 Rank: #${userData.rank}
+💎 $DESTINY: ${formatNumber(userData.balance)}
+🎯 Badges: ${userData.earnedBadges.length}/12
+📅 Days Holding: ${userData.daysHolding}
+
+Join the heroes fighting for crypto's future 🛡️
+
+#DESTINY #crypto`;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✓ Hero card copied! Paste it on X to share with your community.');
+            });
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(2) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toFixed(0);
+        }
+    </script>
+</body>
+</html>
